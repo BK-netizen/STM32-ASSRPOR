@@ -19,13 +19,15 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "i2c.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "OLED.h"
+#include "SR04.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,6 +49,7 @@
 /* USER CODE BEGIN PV */
 uint8_t  cmd = 0;
 uint8_t DJ_State = 0;
+float SR04_Distant=0.0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -90,11 +93,19 @@ int main(void)
   MX_GPIO_Init();
   MX_USART1_UART_Init();
   MX_TIM4_Init();
+  MX_I2C2_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_PWM_Start(&htim4,TIM_CHANNEL_4);
   HAL_UART_Receive_IT(&huart1, &cmd, 1);
+  HAL_TIM_IC_Start_IT(&htim2,TIM_CHANNEL_1);
   //TIM4->CCR4 = 100;
   //TIM4->CCR4 = 200;
+  OLED_Init();
+  OLED_CLS();
+  OLED_ShowStr(40,3,"CM",2);
+//  OLED_ShowNum(0,0,5,2,2);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -102,22 +113,24 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-	if(DJ_State == 1 )
-	{
-		TIM4->CCR4 = 100;
-		//printf("%d\r\n",DJ_State);
-	}
-	else if(DJ_State == 2)
-	{
-		TIM4->CCR4 = 200;
-		//printf("%d\r\n",DJ_State);
-	}
-	HAL_Delay(1000);
-//	else
-//	{
-//		
-//	}
+
     /* USER CODE BEGIN 3 */
+	  SR04_Distant= SR04_GetData();
+	  OLED_ShowNum(3,3,SR04_Distant,4,16);
+	  if(SR04_Distant <10)
+	  {
+		printf("垃圾桶已打开\r\n");
+		HAL_Delay(3000);
+		printf("垃圾桶已关闭\r\n");
+	  }
+	  if(DJ_State == 1)
+	  {
+		printf("可回收垃圾桶已打开\r\n");
+		HAL_Delay(3000);
+		printf("可回收垃圾桶已关闭\r\n");
+		DJ_State = 0;
+	  }
+	  HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
