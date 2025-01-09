@@ -5,16 +5,16 @@
 
 接线：
 ASRPOR   --------- STM32 
-PB6(RX)		PA9(TX)
-PB5(TX)		PA10(RX)
+PB6(RX)	          	PA9(TX)
+PB5(TX)		          PA10(RX)
 
 SR90 ----------------STM32
-DATA		PB9
+DATA		              PB9
 
 SR04 ----------------STM32
-Trig                           PA1
-ECHO                        PA0
+Trig                  PA1
+ECHO                  PA0
 
 OLED -----------------STM32
-SCL		    PB10
-SDA		    PB11
+SCL		                PB10
+SDA		                PB11
